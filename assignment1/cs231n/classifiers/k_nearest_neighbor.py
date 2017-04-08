@@ -95,7 +95,8 @@ class KNearestNeighbor(object):
       # Compute the l2 distance between the ith test point and all training #
       # points, and store the result in dists[i, :].                        #
       #######################################################################
-      pass
+      #dists[i] = np.sqrt(np.sum(np.square(X[i] - self.X_train), axis=1))
+      dists[i, :] = np.sqrt(np.sum(np.square(X[i] - self.X_train), axis=1))
       #######################################################################
       #                         END OF YOUR CODE                            #
       #######################################################################
@@ -123,11 +124,21 @@ class KNearestNeighbor(object):
     # HINT: Try to formulate the l2 distance using matrix multiplication    #
     #       and two broadcast sums.                                         #
     #########################################################################
-    pass
+
+    # infer to http://blog.csdn.net/zhyh1435589631/article/details/54236643
+
+    dists = np.sqrt(
+      self.getNormMatrix(X, num_train).T + self.getNormMatrix(self.X_train, num_test) - 2 * np.dot(X, self.X_train.T))
     #########################################################################
     #                         END OF YOUR CODE                              #
     #########################################################################
     return dists
+
+  def getNormMatrix(self, x, lines_num):
+    """
+    Get a lines_num x size(x, 1) matrix
+    """
+    return np.ones((lines_num, 1)) * np.sum(np.square(x), axis=1)
 
   def predict_labels(self, dists, k=1):
     """
@@ -144,10 +155,11 @@ class KNearestNeighbor(object):
     """
     num_test = dists.shape[0]
     y_pred = np.zeros(num_test)
+    y_pred2 = np.zeros(num_test)
     for i in xrange(num_test):
       # A list of length k storing the labels of the k nearest neighbors to
       # the ith test point.
-      closest_y = []
+      #closest_y = []
       #########################################################################
       # TODO:                                                                 #
       # Use the distance matrix to find the k nearest neighbors of the ith    #
@@ -157,7 +169,7 @@ class KNearestNeighbor(object):
       #########################################################################
 
       sorted_index = np.argsort(dists[i])
-      closet_y = self.y_train[sorted_index][:k]
+      closest_y = self.y_train[sorted_index[:k]]
 
 
       #########################################################################
@@ -167,8 +179,15 @@ class KNearestNeighbor(object):
       # Store this label in y_pred[i]. Break ties by choosing the smaller     #
       # label.                                                                #
       #########################################################################
-      label, _ = sorted([(np.sum(closet_y == i), i) for i in set(closet_y)])[-1]
-      y_pred[i] = label
+
+
+      # xh: can't name variable with i in the for comprehensive, as it's conflicted with above i
+      # timeLabel = sorted([(np.sum(closest_y == i), i) for i in set(closest_y)])[-1]
+
+      timeLabel = sorted([(np.sum(closest_y == y_), y_) for y_ in set(closest_y)])[-1]
+
+      y_pred[i] = timeLabel[1]
+
       #########################################################################
       #                           END OF YOUR CODE                            # 
       #########################################################################
