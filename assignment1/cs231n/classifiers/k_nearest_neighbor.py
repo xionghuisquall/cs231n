@@ -167,11 +167,8 @@ class KNearestNeighbor(object):
       # neighbors. Store these labels in closest_y.                           #
       # Hint: Look up the function numpy.argsort.                             #
       #########################################################################
-
       sorted_index = np.argsort(dists[i])
       closest_y = self.y_train[sorted_index[:k]]
-
-
       #########################################################################
       # TODO:                                                                 #
       # Now that you have found the labels of the k nearest neighbors, you    #
@@ -180,12 +177,9 @@ class KNearestNeighbor(object):
       # label.                                                                #
       #########################################################################
 
-
       # xh: can't name variable with i in the for comprehensive, as it's conflicted with above i
       # timeLabel = sorted([(np.sum(closest_y == i), i) for i in set(closest_y)])[-1]
-
       timeLabel = sorted([(np.sum(closest_y == y_), y_) for y_ in set(closest_y)])[-1]
-
       y_pred[i] = timeLabel[1]
 
       #########################################################################
